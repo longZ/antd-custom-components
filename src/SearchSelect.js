@@ -1,11 +1,22 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Select, Spin } from 'antd'
 
 class SearchSelect extends React.Component {
-  state = {
-    value: null,
-    items: [],
-    fetching: false
+  static propTypes = {
+    onChange: PropTypes.func,
+    SearchMethod: PropTypes.func,
+    value: PropTypes.any
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      value: props.value || props.defaultValue || null,
+      items: [],
+      fetching: false
+    }
   }
 
   static getDerivedStateFromProps (nextProps, state) {
@@ -28,7 +39,10 @@ class SearchSelect extends React.Component {
       if (value) {
         SearchMethod(value).then(res => {
           this.setState({
-            items: res,
+            items: res.map(({value, key, label}) => ({
+              key: key || value,
+              label
+            })),
             fetching: false
           })
         })
@@ -45,38 +59,36 @@ class SearchSelect extends React.Component {
     const { onChange } = this.props
     if (typeof onChange === 'function') {
       onChange(value)
+    } else {
       this.setState({ value })
     }
   }
 
-  handleChange = (value) => {
-    const { items = [] } = this.state
-    const obj = items.find(item => item.value === value)
-
-    this.triggerChange(obj)
+  handleChange = (changeValue) => {
+    this.triggerChange(changeValue)
   }
 
   render () {
-    const { onChange, ...otherProps } = this.props
+    const { mode, onChange, ...otherProps } = this.props
     const { value, items = [], fetching } = this.state
-    let label = null
-    if (value && value.label) label = value.label
 
     return <Select
-      {...otherProps}
-      showSearch
-      allowClear
-      value={label}
-      dropdownMatchSelectWidth={false}
-      defaultActiveFirstOption={false}
-      showArrow={false}
-      filterOption={false}
-      notFoundContent={fetching ? <Spin size='small' /> : items.length ? null
-        : '无数据'}
-      onSearch={this.handleSearch}
-      onChange={this.handleChange}
+        {...otherProps}
+        mode={mode}
+        showSearch
+        allowClear
+        labelInValue
+        value={value}
+        dropdownMatchSelectWidth={false}
+        defaultActiveFirstOption={false}
+        showArrow={false}
+        filterOption={false}
+        notFoundContent={fetching ? <Spin size='small' /> : items.length ? null
+            : '无数据'}
+        onSearch={this.handleSearch}
+        onChange={this.handleChange}
     >
-      {items.map(d => <Select.Option key={d.value}>{d.label}</Select.Option>)}
+      {items.map(d => <Select.Option key={d.key} value={d.key}>{d.label}</Select.Option>)}
     </Select>
   }
 }
