@@ -13,7 +13,7 @@ class TableList extends React.Component {
         pageSizeOptions: props.pageSizeOptions? props.pageSizeOptions: ['10', '20', '30', '40'],
         total: 0,
         showSizeChanger: true,
-        showTotal: total => `共 ${total} 条`
+        showTotal: props.hideTotal ? null : (total => `共 ${total} 条`)
       },
       loading: false
     }
