@@ -1,6 +1,6 @@
 {
   "name": "antd-custom-components",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "antd-custom-components",
   "main": "lib/index.js",
   "module": "es/index.js",

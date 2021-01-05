@@ -15,32 +15,36 @@ class TableList extends React.Component {
         showSizeChanger: true,
         showTotal: props.hideTotal ? null : (total => `共 ${total} 条`)
       },
+      filters: null,
+      sorters: null,
+      extra: null,
       loading: false
     }
   }
 
   componentDidMount() {
-    this.handleTableChange(this.state.pagination)
+    const {pagination, filters, sorters, extra} = this.state
+    this.handleTableChange(pagination, filters, sorters, extra)
   }
 
   search = () => {
-    const {pagination} = this.state
+    const {pagination, filters, sorters, extra} = this.state
     this.handleTableChange({
       ...pagination,
       current: 1
-    })
+    }, filters, sorters, extra)
   }
 
   refresh = () => {
     const {items} = this.props
-    const {pagination} = this.state
+    const {pagination, filters, sorters, extra} = this.state
     if (!items || items.length === 0) {
       pagination.current = pagination.current > 0 ? pagination.current - 1 : 0
     }
-    this.handleTableChange(pagination)
+    this.handleTableChange(pagination, filters, sorters, extra)
   }
 
-  handleTableChange = (pagination) => {
+  handleTableChange = (pagination, filters, sorters, extra) => {
     const {onPageChange} = this.props
 
     if (typeof onPageChange !== 'function') {
@@ -54,7 +58,7 @@ class TableList extends React.Component {
     let pageIndex = pagination.current - 1
     let pageSize = pagination.pageSize
 
-    onPageChange({pageIndex, pageSize}).then(total => {
+    onPageChange({pageIndex, pageSize}, filters, sorters, extra).then(total => {
       if (total > 0 && pageIndex * pageSize >= total && pageIndex > 0) {
         this.setState({
           loading: false
@@ -62,7 +66,7 @@ class TableList extends React.Component {
           this.handleTableChange({
             current: parseInt(`${total / pageSize}`, 10) + (total % pageSize
             === 0 ? 0 : 1), pageSize
-          })
+          }, filters, sorters, extra)
         })
       } else {
         this.setState({
@@ -70,6 +74,9 @@ class TableList extends React.Component {
             ...pagination,
             total
           },
+          filters,
+          sorters,
+          extra,
           loading: false
         })
       }
