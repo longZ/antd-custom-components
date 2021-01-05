@@ -14,7 +14,7 @@ type Pagination = {
 
 export declare type TableListProps = {
   columns: any[]
-  onPageChange(pagination: Pagination): Promise
+  onPageChange(pagination: Pagination, filters: any, sorters: any, extra: any): Promise
   items: any[]
 } & TableProps
 
